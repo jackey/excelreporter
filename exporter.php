@@ -110,7 +110,7 @@ function mail_attachment($to, $subject, $message, $from, $file) {
 	$content = chunk_split(base64_encode(file_get_contents($file)));
 	$uid = md5(uniqid(time()));
 	$from = str_replace(array("\r", "\n"), '', $from); // to prevent email injection
-	$header = "From: ".$from."\r\n"
+	$header = "From: Masterprint<".$from.">\r\n"
 		."MIME-Version: 1.0\r\n"
 		."Content-Type: multipart/mixed; boundary=\"".$uid."\"\r\n\r\n"
 		."This is a multi-part message in MIME format.\r\n" 

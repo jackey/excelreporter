@@ -177,7 +177,7 @@ foreach ($sheets as $index => $sheet) {
 	$to = 'v-beche@microsoft.com';
 	$from = '397420507@qq.com';
 	$message = "您好,\n附件是您在Masterprint 系统下印刷产品的使用统计数据.\n谢谢\n";
-	mail_attachment('397420507@qq.com', '产品的印刷统计数据', wordwrap($message), $from, $path);
+	mail_attachment($to, '产品的印刷统计数据', wordwrap($message), $from, $path);
 }
 
 mysql_close($mysql);

@@ -186,7 +186,7 @@ function process_user_report($uid) {
 		$to = '397420507@qq.com';
 		$from = '397420507@qq.com';
 		$message = "您好,\n附件是您在Masterprint 系统下印刷产品的使用统计数据.\n谢谢\n";
-		//mail_attachment($to, '产品的印刷统计数据', wordwrap($message), $from, $path);
+		mail_attachment($to, '产品的印刷统计数据', wordwrap($message), $from, $path);
 	}
 }
 

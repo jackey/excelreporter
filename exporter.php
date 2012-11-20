@@ -125,59 +125,88 @@ function mail_attachment($to, $subject, $message, $from, $file) {
 		.$content."\r\n\r\n"
 		."--".$uid."--";
 	return mail($to, $subject, "", $header);
- }
- 
+}
+
+function load_user_email($uid) {
+	global $mysql;
+
+	$query = mysql_query("SELECT * FROM users where uid = ". $uid);
+	$row = mysql_fetch_assoc($query);
+	if ($row)
+		return $row['mail'];
+	else 
+		return FALSE;
+}
+
+function process_user_report($uid) {
+	global $config;
+	$mail = load_user_email($uid);
+	if (!$mail) {
+		return FALSE;
+	}
+	$sheets = $config['sheets'];
+
+	foreach ($sheets as $index => $sheet) {
+		if (empty($sheet)) {
+			continue;
+		}
+		$sql = $sheet['sql'];
+		$sql .= " WHERE product_apply.uid = ". $uid;
+		$columns = $sheet['columns'];
+		$name = $sheet['name'];
+		$headers = array_values($columns);
+		//初始化excel对象
+		$excel = init_excel();
+		//设置Excel第一行
+		init_excel_header($excel, $headers);
+		$result = mysql_query($sql);
+
+		if (!$result) {
+			die("MYSQL error". mysql_error());
+		}
+		$crt_index = 1;
+		while ($row = mysql_fetch_assoc($result)) {
+			$data = array();
+			foreach ($columns as $column_name => $column) {
+				$column_value = $row[$column_name];
+				if (!$column_value) {
+					$column_value = "无信息记录";
+				}
+				if (function_exists('process_'.$column_name)) {
+					$column_value = call_user_func('process_'.$column_name, $column_value);
+				}
+				$data[] = $column_value;
+			}
+			excel_write_one_row($excel, $data, $crt_index);
+			$crt_index += 1;
+		}
+		excel_rename_sheet($excel, $index, $name);
+		$path = save_excel($excel, 'product_apply'. $uid);
+		//$to = 'v-beche@microsoft.com';
+		$to = '397420507@qq.com';
+		$from = '397420507@qq.com';
+		$message = "您好,\n附件是您在Masterprint 系统下印刷产品的使用统计数据.\n谢谢\n";
+		//mail_attachment($to, '产品的印刷统计数据', wordwrap($message), $from, $path);
+	}
+}
 
 $config = require('config.php');
 
 $db = $config['db'];
 
-
 $mysql = mysql_connect($db['host'], $db['user'], $db['password']);
 
 mysql_select_db($db['database'], $mysql);
 
-$sheets = $config['sheets'];
+$users = array();
+$query_users = mysql_query("SELECT distinct uid FROM product_apply");
 
-foreach ($sheets as $index => $sheet) {
-	if (empty($sheet)) {
-		continue;
-	}
-	$sql = $sheet['sql'];
-	$columns = $sheet['columns'];
-	$name = $sheet['name'];
-	$headers = array_values($columns);
-	//初始化excel对象
-	$excel = init_excel();
-	//设置Excel第一行
-	init_excel_header($excel, $headers);
-	$result = mysql_query($sql);
+while ($row = mysql_fetch_assoc($query_users)) {
+	$users[] = $row['uid'];
+}
 
-	if (!$result) {
-		die("MYSQL error". mysql_error());
-	}
-	$crt_index = 1;
-	while ($row = mysql_fetch_assoc($result)) {
-		$data = array();
-		foreach ($columns as $column_name => $column) {
-			$column_value = $row[$column_name];
-			if (!$column_value) {
-				$column_value = "无信息记录";
-			}
-			if (function_exists('process_'.$column_name)) {
-				$column_value = call_user_func('process_'.$column_name, $column_value);
-			}
-			$data[] = $column_value;
-		}
-		excel_write_one_row($excel, $data, $crt_index);
-		$crt_index += 1;
-	}
-	excel_rename_sheet($excel, $index, $name);
-	$path = save_excel($excel, 'product_apply');
-	$to = 'v-beche@microsoft.com';
-	$from = '397420507@qq.com';
-	$message = "您好,\n附件是您在Masterprint 系统下印刷产品的使用统计数据.\n谢谢\n";
-	mail_attachment($to, '产品的印刷统计数据', wordwrap($message), $from, $path);
+foreach ($users as $uid) {
+	process_user_report($uid);
 }
 
 mysql_close($mysql);

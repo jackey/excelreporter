@@ -104,9 +104,6 @@ function process_approve_time($time) {
 
 //$file should be absolute path.
 function mail_attachment($to, $subject, $message, $from, $file) {
-	$to = '397420507@qq.com';
-	$from = '397420507@qq.com';
-	$message = 'hello world';
   	//$file should include path and filename
 	$filename = basename($file);
 	$file_size = filesize($file);
@@ -177,7 +174,10 @@ foreach ($sheets as $index => $sheet) {
 	}
 	excel_rename_sheet($excel, $index, $name);
 	$path = save_excel($excel, 'product_apply');
-	mail_attachment('397420507@qq.com', 'hello', 'world', '397420507@qq.com', $path);
+	$to = 'v-beche@microsoft.com';
+	$from = '397420507@qq.com';
+	$message = "您好,\n附件是您在Masterprint 系统下印刷产品的使用统计数据.\n谢谢\n";
+	mail_attachment('397420507@qq.com', '产品的印刷统计数据', wordwrap($message), $from, $path);
 }
 
 mysql_close($mysql);

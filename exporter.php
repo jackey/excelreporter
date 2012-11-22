@@ -6,45 +6,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
 
-// define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
-
-// $objPHPExcel = new PHPExcel();
-
-// $objPHPExcel->getProperties()->setCreator("Masterprint")
-// 							 ->setLastModifiedBy("Masterprint")
-// 							 ->setTitle("Product Apply Document")
-// 							 ->setSubject("Product Apply Document")
-// 							 ->setDescription("")
-// 							 ->setKeywords("")
-// 							 ->setCategory("");
-
-
-// $objPHPExcel->setActiveSheetIndex(0)
-//             ->setCellValue('A1', 'Hello')
-//             ->setCellValue('B2', 'world!')
-//             ->setCellValue('C1', 'Hello')
-//             ->setCellValue('D2', 'world!');
-
-// // Miscellaneous glyphs, UTF-8
-// $objPHPExcel->setActiveSheetIndex(0)
-//             ->setCellValue('A4', 'Miscellaneous glyphs')
-//             ->setCellValue('A5', 'éàèùâêîôûëïüÿäöüç');
-
-// // Rename worksheet
-// $objPHPExcel->getActiveSheet()->setTitle('Simple');
-
-
-// // Set active sheet index to the first sheet, so Excel opens this as the first sheet
-// $objPHPExcel->setActiveSheetIndex(0);
-
-
-// // Save Excel 2007 file
-// $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-// $objWriter->save(str_replace('.php', '.xlsx', __FILE__));
-// // Save Excel5 file
-// $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-// $objWriter->save(str_replace('.php', '.xls', __FILE__));
-
 //初始化一个Excel对象
 function init_excel() {
 	$objPHPExcel = new PHPExcel();
@@ -183,7 +144,7 @@ function process_user_report($uid) {
 		excel_rename_sheet($excel, $index, $name);
 		$path = save_excel($excel, 'product_apply'. $uid);
 		//$to = 'v-beche@microsoft.com';
-		$to = '397420507@qq.com';
+		$to = 'jziwenchen@gmail.com';
 		$from = '397420507@qq.com';
 		$message = "您好,\n附件是您在Masterprint 系统下印刷产品的使用统计数据.\n谢谢\n";
 		mail_attachment($to, '产品的印刷统计数据', wordwrap($message), $from, $path);
